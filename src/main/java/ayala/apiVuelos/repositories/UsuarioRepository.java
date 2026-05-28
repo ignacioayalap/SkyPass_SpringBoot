@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UsuarioRepository extends BaseRepository<Usuario, Long> {
 
-    @Query("SELECT COALESCE(MAX(u.numeroUsuario), 999) FROM Usuario u")
-    int findMaxNumeroUsuario();
+    @Query("SELECT MAX(u.numeroUsuario) FROM Usuario u")
+    Integer findMaxNumeroUsuario();
 }

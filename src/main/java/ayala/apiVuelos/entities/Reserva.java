@@ -1,5 +1,6 @@
 package ayala.apiVuelos.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
@@ -19,6 +20,7 @@ public class Reserva extends Base {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
+    @JsonIgnoreProperties({"consultas", "reservas", "tarjetas", "contraseñaUsuario"})
     private Usuario usuario;
 
     @ManyToOne

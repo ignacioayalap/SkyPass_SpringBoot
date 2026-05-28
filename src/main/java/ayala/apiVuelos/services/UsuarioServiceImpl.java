@@ -18,8 +18,13 @@ public class UsuarioServiceImpl extends BaseServiceImpl<Usuario, Long> implement
     @Override
     @Transactional
     public Usuario save(Usuario entity) throws Exception {
-        if (entity.getNumeroUsuario() <= 0) {
-            entity.setNumeroUsuario(usuarioRepository.findMaxNumeroUsuario() + 1);
+        if (entity.getPersona() == null) {
+            throw new Exception("La persona asociada al usuario es obligatoria.");
+        }
+
+        if (entity.getNumeroUsuario() == null || entity.getNumeroUsuario() <= 0) {
+            Integer maxNumeroUsuario = usuarioRepository.findMaxNumeroUsuario();
+            entity.setNumeroUsuario((maxNumeroUsuario == null ? 999 : maxNumeroUsuario) + 1);
         }
         return super.save(entity);
     }

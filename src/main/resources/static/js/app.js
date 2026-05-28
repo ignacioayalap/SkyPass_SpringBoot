@@ -34,18 +34,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadInitialData() {
     showLoader(true);
     try {
-        // Cargar ciudades
-        appState.cities = await apiService.getCities();
-        populateFilterDropdowns();
-        populateHistoryFilterDropdowns();
-
         appState.flights = await apiService.getFlights();
-        resetInitialSearchFilters();
         renderFlights();
     } catch (e) {
-        showToast('Error al conectar con la API. Asegúrese de que el servidor está encendido.', 'danger');
-        console.error(e);
+        showToast('No se pudieron cargar los vuelos. Verifica la API.', 'danger');
+        console.error('Error cargando vuelos:', e);
+    }
+
+    try {
+        appState.cities = await apiService.getCities();
+    } catch (e) {
+        // Fallback: derivar ciudades desde vuelos para no bloquear la pantalla inicial.
+        appState.cities = extractCitiesFromFlights(appState.flights);
+        console.warn('Error cargando ciudades, usando fallback desde vuelos:', e);
     } finally {
+        populateFilterDropdowns();
+        populateHistoryFilterDropdowns();
+        resetInitialSearchFilters();
+        renderFlights();
         showLoader(false);
     }
 }
@@ -53,6 +59,19 @@ async function loadInitialData() {
 function resetInitialSearchFilters() {
     document.getElementById('filters-form')?.reset();
     document.getElementById('history-filters-form')?.reset();
+}
+
+function extractCitiesFromFlights(flights) {
+    const cityMap = new Map();
+    flights.forEach(flight => {
+        (flight.aeropuertos || []).forEach(aeropuerto => {
+            const city = aeropuerto?.ciudad;
+            if (city?.nombreCiudad && !cityMap.has(city.nombreCiudad)) {
+                cityMap.set(city.nombreCiudad, { nombreCiudad: city.nombreCiudad });
+            }
+        });
+    });
+    return Array.from(cityMap.values());
 }
 
 // Navigation & Routing
@@ -224,6 +243,11 @@ function setupAuthForms() {
         const dni = document.getElementById('reg-dni').value;
         const email = document.getElementById('reg-email').value;
         const pass = document.getElementById('reg-password').value;
+
+        if (!/^\d+$/.test(dni)) {
+            showToast('El DNI debe contener solo números.', 'warning');
+            return;
+        }
 
         if (pass.length < 6) {
             showToast('La contraseña debe tener al menos 6 caracteres.', 'warning');

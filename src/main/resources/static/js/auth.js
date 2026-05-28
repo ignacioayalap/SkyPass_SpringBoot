@@ -45,10 +45,16 @@ class AuthService {
             throw new Error('El correo electrónico ya está registrado.');
         }
 
+        const dniNumero = Number(dni);
+        if (!Number.isInteger(dniNumero) || dniNumero <= 0) {
+            throw new Error('El DNI debe ser un número válido.');
+        }
+
         const newUser = {
-            dniPersona: parseInt(dni),
+            dniPersona: dniNumero,
             nombrePersona: nombre,
             apellidoPersona: apellido,
+            numeroUsuario: 0,
             correoElectronicoUsuario: email,
             contraseñaUsuario: password
         };
@@ -65,7 +71,6 @@ class AuthService {
 
 // Crear la instancia única del Singleton y congelar el objeto
 const authServiceInstance = new AuthService();
-Object.freeze(authServiceInstance);
 
 // Exportar globalmente
 window.authService = authServiceInstance;
