@@ -3,7 +3,9 @@ let appState = {
     flights: [],
     cities: [],
     cart: JSON.parse(localStorage.getItem('skypass_cart')) || [],
-    selectedTariff: null // { flightId, tariffId, clase, precio, impuesto }
+    selectedTariff: null, // { flightId, tariffId, clase, precio, impuesto }
+    reservations: [],
+    activeMainTab: 'flights' // 'flights' | 'reservations'
 };
 
 // DOM Elements
@@ -18,13 +20,13 @@ const views = {
 // Initialize Application
 document.addEventListener('DOMContentLoaded', async () => {
     setupNavigation();
+    setupSearchTabs();
     setupAuthForms();
     setupFilters();
     setupCheckout();
     updateAuthUI();
     updateCartBadge();
-    
-    // Load initial data
+
     await loadInitialData();
 });
 
@@ -32,19 +34,44 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadInitialData() {
     showLoader(true);
     try {
-        // Cargar ciudades
-        appState.cities = await apiService.getCities();
-        populateFilterDropdowns();
-
-        // Cargar vuelos
         appState.flights = await apiService.getFlights();
         renderFlights();
     } catch (e) {
-        showToast('Error al conectar con la API. Asegúrese de que el servidor está encendido.', 'danger');
-        console.error(e);
+        showToast('No se pudieron cargar los vuelos. Verifica la API.', 'danger');
+        console.error('Error cargando vuelos:', e);
+    }
+
+    try {
+        appState.cities = await apiService.getCities();
+    } catch (e) {
+        // Fallback: derivar ciudades desde vuelos para no bloquear la pantalla inicial.
+        appState.cities = extractCitiesFromFlights(appState.flights);
+        console.warn('Error cargando ciudades, usando fallback desde vuelos:', e);
     } finally {
+        populateFilterDropdowns();
+        populateHistoryFilterDropdowns();
+        resetInitialSearchFilters();
+        renderFlights();
         showLoader(false);
     }
+}
+
+function resetInitialSearchFilters() {
+    document.getElementById('filters-form')?.reset();
+    document.getElementById('history-filters-form')?.reset();
+}
+
+function extractCitiesFromFlights(flights) {
+    const cityMap = new Map();
+    flights.forEach(flight => {
+        (flight.aeropuertos || []).forEach(aeropuerto => {
+            const city = aeropuerto?.ciudad;
+            if (city?.nombreCiudad && !cityMap.has(city.nombreCiudad)) {
+                cityMap.set(city.nombreCiudad, { nombreCiudad: city.nombreCiudad });
+            }
+        });
+    });
+    return Array.from(cityMap.values());
 }
 
 // Navigation & Routing
@@ -89,8 +116,9 @@ function showView(viewName) {
     if (views[viewName]) views[viewName].classList.remove('d-none');
 
     const hero = document.getElementById('hero-section');
+    const isMainBrowse = viewName === 'flights' || viewName === 'history';
     if (hero) {
-        if (viewName === 'flights') hero.classList.remove('d-none');
+        if (isMainBrowse) hero.classList.remove('d-none');
         else hero.classList.add('d-none');
     }
 
@@ -98,13 +126,72 @@ function showView(viewName) {
     document.getElementById('nav-history').classList.remove('active');
 
     if (viewName === 'flights') {
+        appState.activeMainTab = 'flights';
+        setSearchTab('flights');
         document.getElementById('nav-flights').classList.add('active');
         renderFlights();
     } else if (viewName === 'history') {
+        appState.activeMainTab = 'reservations';
+        setSearchTab('reservations');
         document.getElementById('nav-history').classList.add('active');
         loadHistory();
     } else if (viewName === 'cart') {
         renderCart();
+    }
+}
+
+function setupSearchTabs() {
+    const tabFlights = document.getElementById('tab-search-flights');
+    const tabReservations = document.getElementById('tab-search-reservations');
+
+    tabFlights?.addEventListener('click', () => switchMainTab('flights'));
+    tabReservations?.addEventListener('click', () => switchMainTab('reservations'));
+
+    document.getElementById('btn-search-flights')?.addEventListener('click', () => {
+        switchMainTab('flights');
+        renderFlights();
+    });
+
+    document.getElementById('btn-search-reservations')?.addEventListener('click', () => {
+        switchMainTab('reservations');
+        loadHistory();
+    });
+
+    document.getElementById('btn-clear-history-filters')?.addEventListener('click', () => {
+        document.getElementById('history-filters-form')?.reset();
+        renderReservationsList();
+    });
+}
+
+function switchMainTab(tab) {
+    if (tab === 'flights') {
+        showView('flights');
+    } else {
+        showView('history');
+    }
+}
+
+function setSearchTab(tab) {
+    const tabFlights = document.getElementById('tab-search-flights');
+    const tabReservations = document.getElementById('tab-search-reservations');
+    const panelFlights = document.getElementById('search-panel-flights');
+    const panelReservations = document.getElementById('search-panel-reservations');
+    const heroTitle = document.getElementById('hero-title');
+    const heroSubtitle = document.getElementById('hero-subtitle');
+
+    tabFlights?.classList.toggle('active', tab === 'flights');
+    tabReservations?.classList.toggle('active', tab === 'reservations');
+    panelFlights?.classList.toggle('d-none', tab !== 'flights');
+    panelReservations?.classList.toggle('d-none', tab !== 'reservations');
+
+    if (heroTitle && heroSubtitle) {
+        if (tab === 'flights') {
+            heroTitle.textContent = 'Encuentra tu próximo vuelo';
+            heroSubtitle.textContent = 'Compará destinos, fechas y tarifas — reservá en minutos';
+        } else {
+            heroTitle.textContent = 'Tus vuelos reservados';
+            heroSubtitle.textContent = 'Consultá y filtrá las reservas que ya confirmaste';
+        }
     }
 }
 
@@ -154,9 +241,13 @@ function setupAuthForms() {
         const nombre = document.getElementById('reg-nombre').value;
         const apellido = document.getElementById('reg-apellido').value;
         const dni = document.getElementById('reg-dni').value;
-        const userNum = document.getElementById('reg-numero').value;
         const email = document.getElementById('reg-email').value;
         const pass = document.getElementById('reg-password').value;
+
+        if (!/^\d+$/.test(dni)) {
+            showToast('El DNI debe contener solo números.', 'warning');
+            return;
+        }
 
         if (pass.length < 6) {
             showToast('La contraseña debe tener al menos 6 caracteres.', 'warning');
@@ -164,9 +255,9 @@ function setupAuthForms() {
         }
 
         try {
-            await authService.register(nombre, apellido, dni, userNum, email, pass);
+            const savedUser = await authService.register(nombre, apellido, dni, email, pass);
             updateAuthUI();
-            showToast('¡Registro completado e inicio de sesión automático!', 'success');
+            showToast(`¡Registro completado! Tu número de usuario es ${savedUser.numeroUsuario}.`, 'success');
             showView('flights');
             document.getElementById('register-form').reset();
         } catch (err) {
@@ -191,7 +282,21 @@ function populateFilterDropdowns() {
     const originSelect = document.getElementById('filter-origin');
     const destSelect = document.getElementById('filter-dest');
 
-    // Limpiar excepto el default
+    originSelect.innerHTML = '<option value="">Cualquier origen</option>';
+    destSelect.innerHTML = '<option value="">Cualquier destino</option>';
+
+    appState.cities.forEach(city => {
+        const option = `<option value="${city.nombreCiudad}">${city.nombreCiudad}</option>`;
+        originSelect.innerHTML += option;
+        destSelect.innerHTML += option;
+    });
+}
+
+function populateHistoryFilterDropdowns() {
+    const originSelect = document.getElementById('history-filter-origin');
+    const destSelect = document.getElementById('history-filter-dest');
+    if (!originSelect || !destSelect) return;
+
     originSelect.innerHTML = '<option value="">Cualquier origen</option>';
     destSelect.innerHTML = '<option value="">Cualquier destino</option>';
 
@@ -583,53 +688,82 @@ async function loadHistory() {
 
     try {
         const reservations = await apiService.getReservations();
-        
-        // Filtrar reservas del usuario actual
-        const userReservations = reservations.filter(r => r.usuario && r.usuario.id === currentUser.id);
-
-        if (userReservations.length === 0) {
-            emptyState.classList.remove('d-none');
-            return;
-        }
-
-        userReservations.forEach(res => {
-            const flight = res.vuelo;
-            if (!flight) return;
-
-            const originCity = flight.aeropuertos && flight.aeropuertos[0] && flight.aeropuertos[0].ciudad ? flight.aeropuertos[0].ciudad.nombreCiudad : 'Origen';
-            const destCity = flight.aeropuertos && flight.aeropuertos[1] && flight.aeropuertos[1].ciudad ? flight.aeropuertos[1].ciudad.nombreCiudad : 'Destino';
-            const depTime = formatDateTime(flight.salida);
-            const airline = flight.aerolinea ? flight.aerolinea.nombreAerolinea : 'Aerolínea';
-            
-            // Pago details
-            const cardInfo = res.pago && res.pago.numeroTarjeta ? `Tarjeta finalizada en ${String(res.pago.numeroTarjeta).slice(-4)}` : 'Pago Directo';
-            const payAmount = res.pago ? res.pago.cantidadPago : 0;
-
-            const historyMarkup = `
-                <div class="result-card">
-                    <div class="row align-items-center g-3">
-                        <div class="col-md-8">
-                            <span class="badge text-bg-success mb-2">Confirmado</span>
-                            <h4 class="fw-bold mb-1">${originCity} <i class="bi bi-arrow-right mx-1"></i> ${destCity}</h4>
-                            <p class="text-muted mb-2">${airline} &bull; Vuelo #${flight.numeroVuelo} &bull; Reserva #${res.numeroReserva}</p>
-                            <small class="text-muted"><i class="bi bi-calendar-event me-1"></i>${depTime.date} · ${depTime.time} hs</small>
-                        </div>
-                        <div class="col-md-4 text-md-end">
-                            <small class="text-muted d-block mb-1">${cardInfo}</small>
-                            <h4 class="fw-bold text-booking">$${payAmount}</h4>
-                        </div>
-                    </div>
-                </div>
-            `;
-            list.innerHTML += historyMarkup;
-        });
-
+        appState.reservations = reservations.filter(r => r.usuario && r.usuario.id === currentUser.id);
+        renderReservationsList();
     } catch (e) {
         showToast('Error al cargar historial de reservas.', 'danger');
         console.error(e);
     } finally {
         loader.classList.add('d-none');
     }
+}
+
+function renderReservationsList() {
+    const list = document.getElementById('history-list');
+    const emptyState = document.getElementById('history-empty');
+    if (!list || !emptyState) return;
+
+    const originFilter = document.getElementById('history-filter-origin')?.value || '';
+    const destFilter = document.getElementById('history-filter-dest')?.value || '';
+    const dateFilter = document.getElementById('history-filter-date')?.value || '';
+
+    list.innerHTML = '';
+
+    const filtered = appState.reservations.filter(res => {
+        const flight = res.vuelo;
+        if (!flight) return false;
+
+        const originCity = flight.aeropuertos?.[0]?.ciudad?.nombreCiudad || '';
+        const destCity = flight.aeropuertos?.[1]?.ciudad?.nombreCiudad || '';
+
+        if (originFilter && originCity !== originFilter) return false;
+        if (destFilter && destCity !== destFilter) return false;
+
+        if (dateFilter && flight.salida) {
+            const flightDate = flight.salida.split('T')[0];
+            if (flightDate !== dateFilter) return false;
+        }
+
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        emptyState.classList.remove('d-none');
+        return;
+    }
+
+    emptyState.classList.add('d-none');
+
+    filtered.forEach(res => {
+        const flight = res.vuelo;
+        if (!flight) return;
+
+        const originCity = flight.aeropuertos?.[0]?.ciudad?.nombreCiudad || 'Origen';
+        const destCity = flight.aeropuertos?.[1]?.ciudad?.nombreCiudad || 'Destino';
+        const depTime = formatDateTime(flight.salida);
+        const airline = flight.aerolinea ? flight.aerolinea.nombreAerolinea : 'Aerolínea';
+        const cardInfo = res.pago?.numeroTarjeta
+            ? `Tarjeta ···· ${String(res.pago.numeroTarjeta).slice(-4)}`
+            : 'Pago confirmado';
+        const payAmount = res.pago ? res.pago.cantidadPago : 0;
+
+        list.innerHTML += `
+            <div class="result-card">
+                <div class="row align-items-center g-3">
+                    <div class="col-md-8">
+                        <span class="badge text-bg-success mb-2">Confirmado</span>
+                        <h4 class="fw-bold mb-1">${originCity} <i class="bi bi-arrow-right mx-1"></i> ${destCity}</h4>
+                        <p class="text-muted mb-2">${airline} &bull; Vuelo #${flight.numeroVuelo} &bull; Reserva #${res.numeroReserva}</p>
+                        <small class="text-muted"><i class="bi bi-calendar-event me-1"></i>${depTime.date} · ${depTime.time} hs</small>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <small class="text-muted d-block mb-1">${cardInfo}</small>
+                        <h4 class="fw-bold text-booking">$${payAmount}</h4>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
 }
 
 // Helpers

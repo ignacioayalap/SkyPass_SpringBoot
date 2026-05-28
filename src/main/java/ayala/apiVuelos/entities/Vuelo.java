@@ -1,5 +1,7 @@
 package ayala.apiVuelos.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -25,10 +27,12 @@ public class Vuelo extends Base {
 
     @ManyToOne
     @JoinColumn(name = "aerolinea_id")
+    @JsonIgnoreProperties({"vuelos"})
     private Aerolinea aerolinea;
 
     @ManyToOne
     @JoinColumn(name = "avion_id")
+    @JsonIgnoreProperties({"asientos"})
     private Avion avion;
 
     @ManyToOne
@@ -41,12 +45,15 @@ public class Vuelo extends Base {
         joinColumns = @JoinColumn(name = "vuelo_id"),
         inverseJoinColumns = @JoinColumn(name = "aeropuerto_id")
     )
+    @JsonIgnoreProperties({"vuelos"})
     private List<Aeropuerto> aeropuertos;
 
     @OneToMany(mappedBy = "vuelo")
+    @JsonIgnoreProperties({"vuelo"})
     private List<Tarifa> tarifas;
 
     @OneToMany(mappedBy = "vuelo")
+    @JsonIgnore
     private List<Reserva> reservas;
 
     public void addAeropuerto(Aeropuerto aeropuerto) {

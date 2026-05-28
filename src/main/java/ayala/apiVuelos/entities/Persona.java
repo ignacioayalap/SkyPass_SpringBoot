@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class Persona extends Base {
+public class Persona extends Base {
     protected int dniPersona;
     protected String nombrePersona;
     protected String apellidoPersona;

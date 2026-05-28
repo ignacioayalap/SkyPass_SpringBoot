@@ -196,10 +196,13 @@ public class DataInitializer implements CommandLineRunner {
             createTarifa(402, 220, 1600, Clase.FIRSTCLASS, v4);
 
             // 8. Usuario de Prueba
+            Persona adminPersona = new Persona();
+            adminPersona.setDniPersona(99999999);
+            adminPersona.setNombrePersona("Ignacio");
+            adminPersona.setApellidoPersona("Ayala");
+
             Usuario defaultUser = new Usuario();
-            defaultUser.setDniPersona(99999999);
-            defaultUser.setNombrePersona("Ignacio");
-            defaultUser.setApellidoPersona("Ayala");
+            defaultUser.setPersona(adminPersona);
             defaultUser.setNumeroUsuario(500);
             defaultUser.setCorreoElectronicoUsuario("admin@vuelos.com");
             defaultUser.setContraseñaUsuario("admin123");

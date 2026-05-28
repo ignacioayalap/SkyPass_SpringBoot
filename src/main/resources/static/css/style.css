@@ -235,9 +235,8 @@ main.main-content {
     color: var(--booking-blue);
 }
 
-.search-tab.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+.search-tab:not(.active):hover {
+    background: rgba(255, 255, 255, 0.35);
 }
 
 .search-form {

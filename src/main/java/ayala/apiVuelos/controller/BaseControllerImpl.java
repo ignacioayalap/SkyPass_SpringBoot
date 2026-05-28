@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public abstract class BaseControllerImpl<E extends Base, Id extends Serializable> implements BaseController<E, Id> {
 
@@ -52,8 +53,9 @@ public abstract class BaseControllerImpl<E extends Base, Id extends Serializable
         try {
             return ResponseEntity.status(HttpStatus.OK).body(service.save(entity));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("{\"error\":\"Error, por favor intente mas tarde.\"}");
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 

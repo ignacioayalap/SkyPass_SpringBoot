@@ -1,5 +1,6 @@
 package ayala.apiVuelos.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -17,5 +18,6 @@ public class Ciudad extends Base {
     private String nombreCiudad;
 
     @OneToMany(mappedBy = "ciudad")
+    @JsonIgnoreProperties({"ciudad", "vuelos"})
     private List<Aeropuerto> aeropuertos;
 }
