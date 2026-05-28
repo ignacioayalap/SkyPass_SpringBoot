@@ -37,7 +37,7 @@ class AuthService {
         }
     }
 
-    async register(nombre, apellido, dni, numeroUsuario, email, password) {
+    async register(nombre, apellido, dni, email, password) {
         // Valida primero si el usuario ya existe
         const users = await apiService.getUsers();
         const exists = users.some(u => u.correoElectronicoUsuario === email);
@@ -49,7 +49,6 @@ class AuthService {
             dniPersona: parseInt(dni),
             nombrePersona: nombre,
             apellidoPersona: apellido,
-            numeroUsuario: parseInt(numeroUsuario),
             correoElectronicoUsuario: email,
             contraseñaUsuario: password
         };

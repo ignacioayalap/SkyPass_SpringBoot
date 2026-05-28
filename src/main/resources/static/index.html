@@ -70,38 +70,74 @@
     <section class="hero-section" id="hero-section">
       <div class="hero-overlay"></div>
       <div class="container hero-content">
-        <h1 class="hero-title">Encuentra tu próximo vuelo</h1>
-        <p class="hero-subtitle">Compará destinos, fechas y tarifas — reservá en minutos</p>
+        <h1 class="hero-title" id="hero-title">Encuentra tu próximo vuelo</h1>
+        <p class="hero-subtitle" id="hero-subtitle">Compará destinos, fechas y tarifas — reservá en minutos</p>
 
         <div class="search-widget shadow-lg">
-          <div class="search-tabs">
-            <button type="button" class="search-tab active"><i class="bi bi-airplane"></i> Vuelos</button>
-            <button type="button" class="search-tab disabled" disabled><i class="bi bi-building"></i> Hoteles</button>
-            <button type="button" class="search-tab disabled" disabled><i class="bi bi-car-front"></i> Autos</button>
+          <div class="search-tabs" role="tablist">
+            <button type="button" class="search-tab active" id="tab-search-flights" data-tab="flights" role="tab">
+              <i class="bi bi-airplane"></i> Vuelos
+            </button>
+            <button type="button" class="search-tab" id="tab-search-reservations" data-tab="reservations" role="tab">
+              <i class="bi bi-bag-check"></i> Mis reservas
+            </button>
           </div>
 
-          <form id="filters-form" class="search-form" onsubmit="return false;">
-            <div class="search-field">
-              <label for="filter-origin"><i class="bi bi-geo-alt"></i> Origen</label>
-              <select class="form-select" id="filter-origin"></select>
-            </div>
-            <div class="search-field">
-              <label for="filter-dest"><i class="bi bi-geo-alt-fill"></i> Destino</label>
-              <select class="form-select" id="filter-dest"></select>
-            </div>
-            <div class="search-field">
-              <label for="filter-date"><i class="bi bi-calendar3"></i> Fecha de salida</label>
-              <input class="form-control" type="date" id="filter-date" />
-            </div>
-            <div class="search-actions">
-              <button type="button" class="btn btn-search" onclick="renderFlights()">
-                <i class="bi bi-search me-1"></i> Buscar
-              </button>
-              <button type="button" class="btn btn-clear" id="btn-clear-filters" title="Limpiar filtros">
-                <i class="bi bi-x-lg"></i>
-              </button>
-            </div>
-          </form>
+          <!-- Panel: buscar vuelos disponibles -->
+          <div id="search-panel-flights">
+            <form id="filters-form" class="search-form" onsubmit="return false;">
+              <div class="search-field">
+                <label for="filter-origin"><i class="bi bi-geo-alt"></i> Origen</label>
+                <select class="form-select" id="filter-origin"></select>
+              </div>
+              <div class="search-field">
+                <label for="filter-dest"><i class="bi bi-geo-alt-fill"></i> Destino</label>
+                <select class="form-select" id="filter-dest"></select>
+              </div>
+              <div class="search-field">
+                <label for="filter-date"><i class="bi bi-calendar3"></i> Fecha de salida</label>
+                <input class="form-control" type="date" id="filter-date" />
+              </div>
+              <div class="search-actions">
+                <button type="button" class="btn btn-search" id="btn-search-flights">
+                  <i class="bi bi-search me-1"></i> Buscar
+                </button>
+                <button type="button" class="btn btn-clear" id="btn-clear-filters" title="Limpiar filtros">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Panel: filtrar mis reservas -->
+          <div id="search-panel-reservations" class="d-none">
+            <form id="history-filters-form" class="search-form" onsubmit="return false;">
+              <div class="search-field">
+                <label for="history-filter-origin"><i class="bi bi-geo-alt"></i> Origen</label>
+                <select class="form-select" id="history-filter-origin">
+                  <option value="">Cualquier origen</option>
+                </select>
+              </div>
+              <div class="search-field">
+                <label for="history-filter-dest"><i class="bi bi-geo-alt-fill"></i> Destino</label>
+                <select class="form-select" id="history-filter-dest">
+                  <option value="">Cualquier destino</option>
+                </select>
+              </div>
+              <div class="search-field">
+                <label for="history-filter-date"><i class="bi bi-calendar3"></i> Fecha de salida</label>
+                <input class="form-control" type="date" id="history-filter-date" />
+              </div>
+              <div class="search-actions">
+                <button type="button" class="btn btn-search" id="btn-search-reservations">
+                  <i class="bi bi-search me-1"></i> Buscar
+                </button>
+                <button type="button" class="btn btn-clear" id="btn-clear-history-filters" title="Limpiar filtros">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </section>
@@ -159,7 +195,7 @@
             <div class="col-12 col-md-8 col-lg-6">
               <div class="auth-card shadow-sm">
                 <h2>Crear cuenta</h2>
-                <p class="text-muted">Registrate para gestionar reservas y pagos</p>
+                <p class="text-muted">Registrate para gestionar reservas y pagos. Tu número de usuario se asignará automáticamente.</p>
                 <form id="register-form">
                   <div class="row g-3">
                     <div class="col-md-6">
@@ -173,10 +209,6 @@
                     <div class="col-md-6">
                       <label class="form-label" for="reg-dni">DNI</label>
                       <input class="form-control" id="reg-dni" required />
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label" for="reg-numero">Nº de usuario</label>
-                      <input class="form-control" id="reg-numero" required />
                     </div>
                     <div class="col-md-6">
                       <label class="form-label" for="reg-email">Email</label>
