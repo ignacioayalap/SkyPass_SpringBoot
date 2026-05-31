@@ -1,5 +1,9 @@
 package ayala.apiVuelos.entities;
 
 public enum TipoTarjeta {
-    CREDITO, DEBITO;
+    VISA,
+    MASTERCARD,
+    AMEX,
+    CREDITO,
+    DEBITO
 }

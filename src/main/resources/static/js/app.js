@@ -614,8 +614,13 @@ function setupCheckout() {
 
         const user = authService.getCurrentUser();
         const cardNumberFormatted = document.getElementById('card-number').value;
-        const cardNumber = parseInt(cardNumberFormatted.replace(/\s+/g, ''));
+        const cardNumber = cardNumberFormatted.replace(/\s+/g, '');
         const cardType = document.getElementById('card-type').value;
+
+        if (!/^\d{13,19}$/.test(cardNumber)) {
+            showToast('Ingresá un número de tarjeta válido (13 a 19 dígitos).', 'warning');
+            return;
+        }
 
         showLoader(true);
 
@@ -627,7 +632,7 @@ function setupCheckout() {
 
                 // 1. Guardar tarjeta (pago)
                 const paymentData = {
-                    numeroPago: Math.floor(100000 + Math.random() * 900000), // Random ID
+                    numeroPago: Math.floor(100000 + Math.random() * 900000),
                     cantidadPago: totalAmount,
                     numeroTarjeta: cardNumber,
                     tipoTarjeta: cardType,
@@ -652,8 +657,9 @@ function setupCheckout() {
             localStorage.removeItem('skypass_cart');
             updateCartBadge();
             
-            showToast('¡Pago procesado y reserva guardada con éxito!', 'success');
+            showToast('¡Su vuelo fue reservado con éxito!', 'success');
             showView('history');
+            loadHistory();
             document.getElementById('checkout-form').reset();
 
         } catch(err) {

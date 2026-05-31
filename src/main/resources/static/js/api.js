@@ -27,7 +27,7 @@ class ApiService {
                 let errMsg = 'Ocurrió un error en la solicitud.';
                 try {
                     const errJson = JSON.parse(text);
-                    errMsg = errJson.error || errMsg;
+                    errMsg = errJson.error || errJson.message || errMsg;
                 } catch(e) {}
                 throw new Error(errMsg);
             }

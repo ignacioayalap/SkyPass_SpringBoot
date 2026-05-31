@@ -2,8 +2,8 @@ package ayala.apiVuelos.services;
 
 import ayala.apiVuelos.entities.Usuario;
 import ayala.apiVuelos.repositories.UsuarioRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UsuarioServiceImpl extends BaseServiceImpl<Usuario, Long> implements UsuarioService {
@@ -16,7 +16,7 @@ public class UsuarioServiceImpl extends BaseServiceImpl<Usuario, Long> implement
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Usuario save(Usuario entity) throws Exception {
         if (entity.getPersona() == null) {
             throw new Exception("La persona asociada al usuario es obligatoria.");
@@ -26,6 +26,7 @@ public class UsuarioServiceImpl extends BaseServiceImpl<Usuario, Long> implement
             Integer maxNumeroUsuario = usuarioRepository.findMaxNumeroUsuario();
             entity.setNumeroUsuario((maxNumeroUsuario == null ? 999 : maxNumeroUsuario) + 1);
         }
-        return super.save(entity);
+
+        return usuarioRepository.save(entity);
     }
 }

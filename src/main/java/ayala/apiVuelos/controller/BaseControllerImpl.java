@@ -55,8 +55,17 @@ public abstract class BaseControllerImpl<E extends Base, Id extends Serializable
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", resolveErrorMessage(e)));
         }
+    }
+
+    private String resolveErrorMessage(Exception e) {
+        Throwable root = e;
+        while (root.getCause() != null) {
+            root = root.getCause();
+        }
+        String message = root.getMessage();
+        return message != null && !message.isBlank() ? message : "Error al procesar la solicitud.";
     }
 
     @PutMapping("/{id}")
