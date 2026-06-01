@@ -105,14 +105,27 @@ main.main-content {
 }
 
 .btn-outline-booking {
-    border: 1px solid #fff;
-    color: #fff;
+    border: 1px solid var(--booking-blue);
+    color: var(--booking-blue);
     font-weight: 500;
     border-radius: var(--radius);
     padding: 0.4rem 1rem;
+    transition: background 0.2s, color 0.2s;
 }
 
 .btn-outline-booking:hover {
+    background: var(--booking-blue);
+    color: #fff;
+    border-color: var(--booking-blue);
+}
+
+/* Keep white style when inside the dark header */
+.site-header .btn-outline-booking {
+    border-color: #fff;
+    color: #fff;
+}
+
+.site-header .btn-outline-booking:hover {
     background: rgba(255, 255, 255, 0.15);
     color: #fff;
     border-color: #fff;

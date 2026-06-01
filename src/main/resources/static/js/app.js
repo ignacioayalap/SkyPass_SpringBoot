@@ -378,6 +378,7 @@ function renderFlights() {
                                     <h4 class="fw-bold mb-0">${depTime.time}</h4>
                                     <div class="fw-semibold">${originCity}</div>
                                     <small class="text-muted d-block text-truncate" title="${originAirport}">${originAirport}</small>
+                                    <small class="text-muted d-block mt-1"><i class="bi bi-calendar-event me-1"></i>${depTime.date}</small>
                                 </div>
                                 <div class="col-2 flight-route">
                                     <div class="flight-route-icon">
