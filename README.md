@@ -231,73 +231,7 @@ curl http://localhost:9000/api/v1/vuelos
 
 ##  Modelo de Datos
 
-```mermaid
-erDiagram
-    CIUDAD ||--o{ AEROPUERTO : tiene
-    AEROPUERTO }o--o{ VUELO : conecta
-    AEROLINEA ||--o{ VUELO : opera
-    AVION ||--o{ VUELO : asignado
-    PILOTO ||--o{ VUELO : pilotea
-    VUELO ||--o{ TARIFA : ofrece
-    VUELO ||--o{ RESERVA : tiene
-    USUARIO ||--o{ RESERVA : realiza
-    USUARIO ||--o{ TARJETA : posee
-    RESERVA ||--|| TARJETA : paga_con
-    PERSONA ||--|| USUARIO : es
-    AVION ||--o{ ASIENTO : contiene
-
-    CIUDAD {
-        Long id PK
-        String nombreCiudad
-    }
-    AEROPUERTO {
-        Long id PK
-        String nombreAeropuerto
-        Long ciudad_id FK
-    }
-    AEROLINEA {
-        Long id PK
-        String nombreAerolinea
-    }
-    VUELO {
-        Long id PK
-        int numeroVuelo
-        LocalDateTime salida
-        LocalDateTime destino
-        Long aerolinea_id FK
-        Long avion_id FK
-        Long piloto_id FK
-    }
-    TARIFA {
-        Long id PK
-        int numeroTarifa
-        int precioTarifa
-        int impuestoTarifa
-        Clase claseTarifa
-        Long vuelo_id FK
-    }
-    USUARIO {
-        Long id PK
-        int numeroUsuario
-        String correoElectronico
-        String contrasena
-    }
-    RESERVA {
-        Long id PK
-        int numeroReserva
-        Long usuario_id FK
-        Long vuelo_id FK
-        Long pago_id FK
-    }
-    TARJETA {
-        Long id PK
-        int numeroPago
-        int cantidadPago
-        String numeroTarjeta
-        TipoTarjeta tipoTarjeta
-        Long usuario_id FK
-    }
-```
+![Diagrama UML del Modelo de Datos](assets/modelo-datos.png)
 
 ### Enumeraciones
 
