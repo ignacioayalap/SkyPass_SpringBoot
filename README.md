@@ -255,7 +255,7 @@ curl http://localhost:9000/api/v1/vuelos
 
 ### Frontend
 - **HTML5** — Estructura semántica
-- **CSS3** — Estilos custom (diseño inspirado en Booking.com)
+- **CSS3** — Estilos custom (diseño inspirado)
 - **JavaScript (ES6+)** — Lógica de la SPA (vanilla, sin frameworks)
 - **Bootstrap 5.3.3** — Componentes y layout responsivo
 - **Bootstrap Icons** — Iconografía
