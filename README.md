@@ -1,4 +1,4 @@
-# ✈️ SkyPass — Sistema de Reserva de Vuelos
+# SkyPass — Sistema de Reserva de Vuelos
 
 <div align="center">
 
@@ -16,20 +16,20 @@
 
 ---
 
-## 📋 Características
+## Características
 
-- 🔍 **Búsqueda de vuelos** con filtros por origen, destino y fecha de salida
-- 🛒 **Carrito de reservas** para seleccionar vuelos y clases (Turista, Primera Clase, Económica)
-- 💳 **Proceso de pago** con validación de tarjeta y resumen de costos
-- 📄 **Historial de reservas** con detalle de pagos y vuelos confirmados
-- 👤 **Registro e inicio de sesión** de usuarios
-- 🌱 **Datos de prueba** precargados automáticamente al iniciar (ciudades, aeropuertos, aerolíneas, vuelos y tarifas)
-- 🖥️ **Apertura automática del navegador** al iniciar la aplicación
-- 📱 **Diseño responsivo** inspirado en Booking.com con Bootstrap 5
+-  **Búsqueda de vuelos** con filtros por origen, destino y fecha de salida
+-  **Carrito de reservas** para seleccionar vuelos y clases (Turista, Primera Clase, Económica)
+-  **Proceso de pago** con validación de tarjeta y resumen de costos
+-  **Historial de reservas** con detalle de pagos y vuelos confirmados
+-  **Registro e inicio de sesión** de usuarios
+-  **Datos de prueba** precargados automáticamente al iniciar (ciudades, aeropuertos, aerolíneas, vuelos y tarifas)
+-  **Apertura automática del navegador** al iniciar la aplicación
+-  **Diseño responsivo** con Bootstrap 5
 
 ---
 
-## 🏗️ Arquitectura
+##  Arquitectura
 
 El proyecto sigue una **arquitectura de capas** con patrón genérico base para servicios y controladores:
 
@@ -78,7 +78,7 @@ src/main/resources/
 
 ---
 
-## 🚀 Instalación
+##  Instalación
 
 ### Prerrequisitos
 
@@ -136,7 +136,7 @@ Al primer arranque, se siembran datos de prueba incluyendo un usuario predetermi
 
 ---
 
-## 📡 API Endpoints
+##  API Endpoints
 
 Todos los endpoints están bajo el prefijo `/api/v1`. Cada entidad expone un CRUD genérico heredado de `BaseControllerImpl`.
 
@@ -192,7 +192,7 @@ curl http://localhost:9000/api/v1/vuelos
 ```
 
 <details>
-<summary>📦 Respuesta de ejemplo</summary>
+<summary> Respuesta de ejemplo</summary>
 
 ```json
 [
@@ -229,7 +229,7 @@ curl http://localhost:9000/api/v1/vuelos
 
 ---
 
-## 📊 Modelo de Datos
+##  Modelo de Datos
 
 ```mermaid
 erDiagram
@@ -309,7 +309,7 @@ erDiagram
 
 ---
 
-## 🛠️ Tecnologías
+##  Tecnologías
 
 ### Backend
 - **Java 26** — Lenguaje principal
@@ -329,7 +329,7 @@ erDiagram
 
 ---
 
-## 📁 Configuración
+##  Configuración
 
 El archivo `application.properties` permite ajustar:
 
@@ -351,7 +351,7 @@ app.ui.open-browser=true
 
 ---
 
-## 🤝 Contribución
+##  Contribución
 
 1. Hacer fork del repositorio
 2. Crear una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
@@ -361,12 +361,12 @@ app.ui.open-browser=true
 
 ---
 
-## 👤 Autor
+##  Autor
 
-**Ignacio Ayala**
+**Ayala Poquet, Ignacio**
 
 ---
 
-## 📄 Licencia
+##  Licencia
 
 Este proyecto es de uso académico y personal.
