@@ -16,22 +16,21 @@
 
 ---
 
-## Características
+## Servicios
 
 -  **Búsqueda de vuelos** con filtros por origen, destino y fecha de salida
 -  **Carrito de reservas** para seleccionar vuelos y clases (Turista, Primera Clase, Económica)
 -  **Proceso de pago** con validación de tarjeta y resumen de costos
--  **Historial de reservas** con detalle de pagos y vuelos confirmados
--  **Registro e inicio de sesión** de usuarios
+-  **Historial de reservas** con detalle de pagos y vuelos confirmados del ususario
+-  **Registro e inicio de sesión**
 -  **Datos de prueba** precargados automáticamente al iniciar (ciudades, aeropuertos, aerolíneas, vuelos y tarifas)
--  **Apertura automática del navegador** al iniciar la aplicación
 -  **Diseño responsivo** con Bootstrap 5
 
 ---
 
 ##  Arquitectura
 
-El proyecto sigue una **arquitectura de capas** con patrón genérico base para servicios y controladores:
+El proyecto sigue una **arquitectura de capas inspirado en modelo MVC académico** y con patrones genéricos base para servicios y controladores:
 
 ```
 src/main/java/ayala/apiVuelos/
@@ -123,11 +122,11 @@ spring.datasource.password=tu_contraseña
 ./gradlew bootRun
 ```
 
-La aplicación se inicia en **http://localhost:9000** y abre el navegador automáticamente.
+La aplicación se inicia en **http://localhost:9000** 
 
 ### 4. Usuario de prueba
 
-Al primer arranque, se siembran datos de prueba incluyendo un usuario predeterminado:
+Al primer arranque, se siembran datos de prueba incluyendo una cuenta de usuario admin:
 
 | Campo | Valor |
 |---|---|
@@ -170,7 +169,7 @@ Todos los endpoints están bajo el prefijo `/api/v1`. Cada entidad expone un CRU
 | Consultas | `/api/v1/consultas` |
 | Pagos | `/api/v1/pagos` |
 
-### Endpoints especiales
+### Endpoints dto
 
 #### Crear reserva
 ```http
@@ -184,48 +183,11 @@ Content-Type: application/json
   "pagoId": 1
 }
 ```
-
 ### Ejemplo: consultar vuelos
 
 ```bash
 curl http://localhost:9000/api/v1/vuelos
 ```
-
-<details>
-<summary> Respuesta de ejemplo</summary>
-
-```json
-[
-  {
-    "id": 1,
-    "numeroVuelo": 1001,
-    "salida": "2026-06-02T18:00:00",
-    "destino": "2026-06-03T06:30:00",
-    "aerolinea": {
-      "id": 1,
-      "nombreAerolinea": "Aerolíneas Argentinas"
-    },
-    "aeropuertos": [
-      {
-        "id": 1,
-        "nombreAeropuerto": "Aeropuerto Internacional de Ezeiza (EZE)",
-        "ciudad": { "id": 1, "nombreCiudad": "Buenos Aires" }
-      },
-      {
-        "id": 3,
-        "nombreAeropuerto": "Aeropuerto Adolfo Suárez Madrid-Barajas (MAD)",
-        "ciudad": { "id": 2, "nombreCiudad": "Madrid" }
-      }
-    ],
-    "tarifas": [
-      { "id": 1, "numeroTarifa": 101, "precioTarifa": 1200, "impuestoTarifa": 150, "claseTarifa": "TURISTA" },
-      { "id": 2, "numeroTarifa": 102, "precioTarifa": 2500, "impuestoTarifa": 300, "claseTarifa": "FIRSTCLASS" },
-      { "id": 3, "numeroTarifa": 103, "precioTarifa": 950, "impuestoTarifa": 100, "claseTarifa": "ECONOMICA" }
-    ]
-  }
-]
-```
-</details>
 
 ---
 
@@ -250,13 +212,13 @@ curl http://localhost:9000/api/v1/vuelos
 - **Spring Boot 4.0.6** — Framework web y DI
 - **Spring Data JPA** — Persistencia ORM con Hibernate
 - **MySQL** — Base de datos relacional
-- **Lombok** — Reducción de boilerplate (getters, setters, constructores)
+- **Lombok** — Reducción de código boilerplate (getters, setters, constructores)
 - **Gradle** — Build tool y gestión de dependencias
 
-### Frontend
+### Frontend UI
 - **HTML5** — Estructura semántica
 - **CSS3** — Estilos custom (diseño inspirado)
-- **JavaScript (ES6+)** — Lógica de la SPA (vanilla, sin frameworks)
+- **JavaScript (ES6+)** — Lógica de la SPA (vanilla)
 - **Bootstrap 5.3.3** — Componentes y layout responsivo
 - **Bootstrap Icons** — Iconografía
 - **Google Fonts (Inter)** — Tipografía moderna
@@ -287,7 +249,7 @@ app.ui.open-browser=true
 
 ##  Contribución
 
-1. Hacer fork del repositorio
+1. Para hacer un fork del repositorio
 2. Crear una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
 3. Commitear tus cambios (`git commit -m 'Agrego nueva funcionalidad'`)
 4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
